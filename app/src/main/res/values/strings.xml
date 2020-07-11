@@ -2,6 +2,8 @@
     <string name="app_name">SQLDATABaseExample</string>
     <string name="addEmp">Add Emp</string>
     <string name="Emp">Enter Emp</string>
+    <string name="edit_employee">Edit Employee</string>
+    <string name="select_department">Select Department</string>
     <string-array name="departments">
         <item>Technical</item>
         <item>Support</item>
