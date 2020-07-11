@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.sqldatabaseexample.model.Employee;
+import com.example.sqldatabaseexample.util.DataBaseHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,10 +28,12 @@ public class EmployeeAdapter extends ArrayAdapter {
     int layoutRes;
     List<Employee> employeeList;
 
-    SQLiteDatabase sqLiteDatabase;
+    //  SQLiteDatabase sqLiteDatabase;
 
-    public EmployeeAdapter(@NonNull Context context, int resource, List<Employee> employeeList, SQLiteDatabase sqLiteDatabase) {
-        super(context, resource,employeeList);
+    DataBaseHelper sqLiteDatabase;
+
+    public EmployeeAdapter(@NonNull Context context, int resource, List<Employee> employeeList, DataBaseHelper sqLiteDatabase) {
+        super(context, resource, employeeList);
         this.employeeList = employeeList;
         this.sqLiteDatabase = sqLiteDatabase;
         this.context = context;
@@ -42,7 +45,7 @@ public class EmployeeAdapter extends ArrayAdapter {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View v = inflater.inflate(layoutRes,null);
+        View v = inflater.inflate(layoutRes, null);
         TextView nameTV = v.findViewById(R.id.tv_name);
         TextView salaryTV = v.findViewById(R.id.tv_salary);
         TextView departmentsTV = v.findViewById(R.id.tv_department);
@@ -66,24 +69,25 @@ public class EmployeeAdapter extends ArrayAdapter {
                 deleteEmployee(employee);
             }
         });
-       return v;
+        return v;
     }
 
     private void deleteEmployee(final Employee employee) {
-        AlertDialog.Builder builder= new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Are u sure to delete?");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String sql = "DELETE FROM employee WHERE id = ?";
-                sqLiteDatabase.execSQL(sql, new Integer[]{employee.getId()});
-                loadEmployees();
+                //      String sql = "DELETE FROM employee WHERE id = ?";
+                //    sqLiteDatabase.execSQL(sql, new Integer[]{employee.getId()});
+                if (sqLiteDatabase.deleteEmployee(employee.getId()))
+                    loadEmployees();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(getContext(),"Employee ("+employee.getName()+" ) note deleted",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Employee (" + employee.getName() + " ) note deleted", Toast.LENGTH_SHORT).show();
             }
         });
         AlertDialog alertDialog = builder.create();
@@ -91,27 +95,29 @@ public class EmployeeAdapter extends ArrayAdapter {
     }
 
     private void loadEmployees() {
-        String sql = "SELECT * FROM employee";
-        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+        // String sql = "SELECT * FROM employee";
+        //Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+        Cursor cursor = sqLiteDatabase.getAllEmployees();
+
         employeeList.clear();
         if (cursor.moveToFirst()) {
-            do{
+            do {
                 //create an employee instace
                 employeeList.add(new Employee(cursor.getInt(0),
                         cursor.getString(1),
                         cursor.getString(2),
                         cursor.getString(3),
                         cursor.getDouble(4)));
-            }while(cursor.moveToNext());
+            } while (cursor.moveToNext());
             cursor.close();
         }
         notifyDataSetChanged();
     }
 
     private void updateEmployee(final Employee employee) {
-        AlertDialog.Builder builder= new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = LayoutInflater.from(context);
-        View v = inflater.inflate(R.layout.dialog_update_employee,null);
+        View v = inflater.inflate(R.layout.dialog_update_employee, null);
         builder.setView(v);
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -132,24 +138,23 @@ public class EmployeeAdapter extends ArrayAdapter {
                 String salary = salaryET.getText().toString().trim();
                 String department = departmentET.getSelectedItem().toString().trim();
 
-                if(name.isEmpty())
-                {
+                if (name.isEmpty()) {
                     nameET.setError("Fileds cannoy be empty");
                     nameET.requestFocus();
                     return;
                 }
 
-                if(salary.isEmpty())
-                {
+                if (salary.isEmpty()) {
                     salaryET.setError("Fileds cannoy be empty");
                     salaryET.requestFocus();
                     return;
                 }
-                String sql = "UPDATE employee SET name = ?, department = ?, salary = ? WHERE id = ?" ;
+                //    String sql = "UPDATE employee SET name = ?, department = ?, salary = ? WHERE id = ?" ;
 
-                       sqLiteDatabase.execSQL(sql, new String[]{name,department,salary,String.valueOf(employee.getId())});
+                //         sqLiteDatabase.execSQL(sql, new String[]{name,department,salary,String.valueOf(employee.getId())});
+                if (sqLiteDatabase.updateEmployee(employee.getId(), name, department, Double.valueOf(salary)))
                     loadEmployees();
-                    alertDialog.dismiss();
+                alertDialog.dismiss();
             }
         });
 

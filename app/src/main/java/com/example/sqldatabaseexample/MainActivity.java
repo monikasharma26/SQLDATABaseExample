@@ -11,6 +11,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.sqldatabaseexample.model.Employee;
+import com.example.sqldatabaseexample.util.DataBaseHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,9 +19,13 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    //
-    public static final String DATABASE_NAME = "myData";
-    SQLiteDatabase sqLiteDatabase;
+    //Comment bcz created Class DATABASEHELPER
+ /*   public static final String DATABASE_NAME = "myData";
+    SQLiteDatabase sqLiteDatabase;*/
+
+    //SQLite OPENHELPER instance
+    DataBaseHelper sqLiteDatabase;
+
     EditText etanme, EtSalrt;
     Spinner spDep;
 
@@ -45,10 +50,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        sqLiteDatabase = openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
-        createTable();
-    }
+     //   sqLiteDatabase = openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
+       // createTable();
 
+        //Initializing the insatnce of SQLITE OPENHELPER Class
+        sqLiteDatabase = new DataBaseHelper(this);
+    }
+/*
     private void createTable() {
         String sql = "CREATE TABLE IF NOT EXISTS employee ( " +
                 "id INTEGER NOT NULL CONSTRAINT employee_pk PRIMARY KEY AUTOINCREMENT," +
@@ -58,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 "Salary DOUBLE NOT NULL);";
         sqLiteDatabase.execSQL(sql);
 
-    }
+    }*/
 
 
 
@@ -82,10 +90,18 @@ public class MainActivity extends AppCompatActivity {
             EtSalrt.requestFocus();
             return;
         }
-        String sql = "INSERT INTO employee (name, department,joining_date,Salary)" +
-                "VAlUES(?, ?, ?, ?)";
-        sqLiteDatabase.execSQL(sql, new String[]{name, department, joining_date, Salary});
+//        String sql = "INSERT INTO employee (name, department,joining_date,Salary)" +
+//                "VAlUES(?, ?, ?, ?)";
+//        sqLiteDatabase.execSQL(sql, new String[]{name, department, joining_date, Salary});
+//
+
+
+        if (sqLiteDatabase.addEmployee(name, department , joining_date ,Double.valueOf (Salary)))
         Toast.makeText(this,"Employee Added",Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this,"Employee is Not Added",Toast.LENGTH_LONG).show();
+
+
     }
 
     @Override

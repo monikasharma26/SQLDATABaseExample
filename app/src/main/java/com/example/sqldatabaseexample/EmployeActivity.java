@@ -8,13 +8,17 @@ import android.os.Bundle;
 import android.widget.ListView;
 
 import com.example.sqldatabaseexample.model.Employee;
+import com.example.sqldatabaseexample.util.DataBaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeActivity extends AppCompatActivity {
 
-    SQLiteDatabase sqLiteDatabase;
+   // SQLiteDatabase sqLiteDatabase;
+
+    DataBaseHelper sqLiteDatabase;
+
     List<Employee> employeeList;
 
     ListView employeeListView;
@@ -27,7 +31,10 @@ public class EmployeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_employe);
         employeeListView = findViewById(R.id.lv_employees);
         employeeList = new ArrayList<>();
-        sqLiteDatabase = openOrCreateDatabase(MainActivity.DATABASE_NAME, MODE_PRIVATE, null);
+        //sqLiteDatabase = openOrCreateDatabase(MainActivity.DATABASE_NAME, MODE_PRIVATE, null);
+
+        sqLiteDatabase = new DataBaseHelper(this);
+
         loadEmployees();
         employeeAdapter = new EmployeeAdapter(this,R.layout.list_layout_employee,employeeList,sqLiteDatabase);
 
@@ -35,8 +42,10 @@ public class EmployeActivity extends AppCompatActivity {
     }
 
     private void loadEmployees() {
-        String sql = "SELECT * FROM employee";
-        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        //String sql = "SELECT * FROM employee";
+       // Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        Cursor cursor = sqLiteDatabase.getAllEmployees();
+
         if (cursor.moveToFirst()) {
             do{
                 //create an employee instace
